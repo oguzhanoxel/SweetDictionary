@@ -35,8 +35,8 @@ public abstract class EfRepositoryBase<TContext, TEntity, TId> : IRepository<TEn
 		Expression<Func<TEntity, bool>> predicate,
 		Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? include = null)
 	{
-		var query = BuildQuery(include);
-
+		IQueryable<TEntity> query = _context.Set<TEntity>();
+		if (include != null) query = include(query);
 		return query.SingleOrDefault(predicate);
 	}
 
@@ -44,7 +44,9 @@ public abstract class EfRepositoryBase<TContext, TEntity, TId> : IRepository<TEn
 		Expression<Func<TEntity, bool>>? predicate = null,
 		Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? include = null)
 	{
-		var query = BuildQuery(include);
+		IQueryable<TEntity> query = _context.Set<TEntity>();
+
+		if (include != null) query = include(query);
 		if (predicate != null) query = query.Where(predicate);
 
 		return query.ToList();
@@ -52,15 +54,9 @@ public abstract class EfRepositoryBase<TContext, TEntity, TId> : IRepository<TEn
 
 	public TEntity Update(TEntity entity)
 	{
+		entity.UpdatedTime = DateTime.Now;
 		_context.Set<TEntity>().Update(entity);
 		_context.SaveChanges();
 		return entity;
-	}
-
-	private IQueryable<TEntity> BuildQuery(
-		Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? include)
-	{
-		var query = _context.Set<TEntity>().AsQueryable();
-		return include != null ? include(query) : query;
 	}
 }

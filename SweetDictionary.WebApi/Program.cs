@@ -1,4 +1,5 @@
-
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.EntityFrameworkCore;
 using SweetDictionary.Application.Mappings;
 using SweetDictionary.Application.Services.Abstracts;
 using SweetDictionary.Application.Services.Concretes;
@@ -19,9 +20,17 @@ namespace SweetDictionary.WebApi
 			builder.Services.AddControllers();
 
 			builder.Services.AddScoped<IPostService, PostService>();
-			builder.Services.AddScoped<IPostRepository, EfPostRepository>();
+			builder.Services.AddScoped<IUserService, UserService>();
+			builder.Services.AddScoped<ICategoryService, CategoryService>();
+			builder.Services.AddScoped<ICommentService, CommentService>();
 
-			builder.Services.AddDbContext<EfCoreDbContext>();
+			builder.Services.AddScoped<IPostRepository, EfPostRepository>();
+			builder.Services.AddScoped<IUserRepository, EfUserRepository>();
+			builder.Services.AddScoped<ICategoryRepository, EfCategoryRepository>();
+			builder.Services.AddScoped<ICommentRepository, EfCommentRepository>();
+
+			builder.Services.AddDbContext<EfCoreDbContext>(opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("SqlConnection")));
+
 			builder.Services.AddAutoMapper(typeof(MappingProfiles));
 
 			// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

@@ -10,5 +10,7 @@ public interface IPostService
 	DataResult<PostResponseDto> Update(UpdatePostRequestDto dto);
 	DataResult<PostResponseDto> Delete(DeletePostRequestDto dto);
 	DataResult<List<PostResponseDto>> GetAll();
+	DataResult<List<PostDetailResponseDto>> GetDetailAll();
 	DataResult<PostResponseDto> GetById(Guid id);
+	DataResult<PostDetailResponseDto> GetDetailById(Guid id);
 }
