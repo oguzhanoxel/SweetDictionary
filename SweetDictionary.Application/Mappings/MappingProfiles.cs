@@ -18,7 +18,6 @@ public class MappingProfiles : Profile
 		// Post
         CreateMap<CreatePostRequestDto, Post>().ReverseMap();
         CreateMap<UpdatePostRequestDto, Post>().ReverseMap();
-        CreateMap<DeletePostRequestDto, Post>().ReverseMap();
 
 		CreateMap<Post, PostResponseDto>();
 		CreateMap<Post, PostDetailResponseDto>();
@@ -26,14 +25,12 @@ public class MappingProfiles : Profile
 		// Category
 		CreateMap<CreateCategoryRequestDto, Category>().ReverseMap();
 		CreateMap<UpdateCategoryRequestDto, Category>().ReverseMap();
-		CreateMap<DeleteCategoryRequestDto, Category>().ReverseMap();
 
 		CreateMap<Category, CategoryResponseDto>();
 
 		// Comment
 		CreateMap<CreateCommentRequestDto, Comment>().ReverseMap();
 		CreateMap<UpdateCommentRequestDto, Comment>().ReverseMap();
-		CreateMap<DeleteCommentRequestDto, Comment>().ReverseMap();
 
 		CreateMap<Comment, CommentResponseDto>();
 		CreateMap<Comment, CommentDetailResponseDto>();
@@ -41,7 +38,6 @@ public class MappingProfiles : Profile
 		// User
 		CreateMap<CreateUserRequestDto, User>().ReverseMap();
 		CreateMap<UpdateUserRequestDto, User>().ReverseMap();
-		CreateMap<DeleteUserRequestDto, User>().ReverseMap();
 
 		CreateMap<User, UserResponseDto>();
 	}

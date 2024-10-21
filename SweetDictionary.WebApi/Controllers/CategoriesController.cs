@@ -22,18 +22,18 @@ public class CategoriesController : ControllerBase
 		return Ok(result);
 	}
 
-	[HttpPut]
-	public IActionResult Update([FromBody] UpdateCategoryRequestDto dto)
+	[HttpPut("{id:guid}")]
+	public IActionResult Update(Guid id, [FromBody] UpdateCategoryRequestDto dto)
 	{
-		var result = _categoryService.Update(dto);
+		var result = _categoryService.Update(id, dto);
 		if (!result.IsSuccess) return BadRequest(result);
 		return Ok(result);
 	}
 
-	[HttpDelete]
-	public IActionResult Delete([FromBody] DeleteCategoryRequestDto dto)
+	[HttpDelete("{id:guid}")]
+	public IActionResult Delete([FromRoute] Guid id)
 	{
-		var result = _categoryService.Delete(dto);
+		var result = _categoryService.Delete(id);
 		if (!result.IsSuccess) return BadRequest(result);
 		return Ok(result);
 	}

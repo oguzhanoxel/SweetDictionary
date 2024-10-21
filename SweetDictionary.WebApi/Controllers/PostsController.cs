@@ -22,18 +22,18 @@ public class PostsController : ControllerBase
 		return Ok(result);
 	}
 
-    [HttpPut]
-    public IActionResult Update([FromBody] UpdatePostRequestDto dto)
+    [HttpPut("{id:guid}")]
+    public IActionResult Update([FromRoute] Guid id, [FromBody] UpdatePostRequestDto dto)
     {
-        var result = _postService.Update(dto);
+        var result = _postService.Update(id, dto);
         if (!result.IsSuccess) BadRequest(result);
         return Ok(result);
     }
 
-    [HttpDelete]
-    public IActionResult Delete([FromBody] DeletePostRequestDto dto)
+    [HttpDelete("{id:guid}")]
+    public IActionResult Delete([FromRoute] Guid id)
     {
-        var result = _postService.Delete(dto);
+        var result = _postService.Delete(id);
         if (!result.IsSuccess) BadRequest(result);
         return Ok(result);
     }

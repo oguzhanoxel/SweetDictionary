@@ -22,18 +22,18 @@ public class CommentsController : ControllerBase
 		return Ok(result);
 	}
 
-	[HttpPut]
-	public IActionResult Update([FromBody] UpdateCommentRequestDto dto)
+	[HttpPut("{id:guid}")]
+	public IActionResult Update([FromRoute] Guid id, [FromBody] UpdateCommentRequestDto dto)
 	{
-		var result = _commentService.Update(dto);
+		var result = _commentService.Update(id, dto);
 		if (!result.IsSuccess) return BadRequest(result);
 		return Ok(result);
 	}
 
-	[HttpDelete]
-	public IActionResult Delete([FromBody] DeleteCommentRequestDto dto)
+	[HttpDelete("{id:guid}")]
+	public IActionResult Delete([FromRoute] Guid id)
 	{
-		var result = _commentService.Delete(dto);
+		var result = _commentService.Delete(id);
 		if (!result.IsSuccess) return BadRequest(result);
 		return Ok(result);
 	}

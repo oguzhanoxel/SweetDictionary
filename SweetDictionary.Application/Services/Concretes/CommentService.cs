@@ -28,14 +28,20 @@ public class CommentService : ICommentService
 
 		return ResultFactory.Success(
 			response,
-			statusCode: System.Net.HttpStatusCode.Created);
+		statusCode: System.Net.HttpStatusCode.Created);
 	}
 
-	public DataResult<CommentResponseDto> Delete(DeleteCommentRequestDto dto)
+	public DataResult<CommentResponseDto> Delete(Guid id)
 	{
-		Comment deleted = _mapper.Map<Comment>(dto);
-		var comment = _commentRepository.Delete(deleted);
-		CommentResponseDto response = _mapper.Map<CommentResponseDto>(comment);
+		Comment? comment = _commentRepository.Get(x => x.Id == id);
+
+		if (comment is null) return ResultFactory.Failure<CommentResponseDto>(
+			null,
+			message: "Not Found",
+			statusCode: System.Net.HttpStatusCode.NotFound);
+
+		var deleted = _commentRepository.Delete(comment);
+		CommentResponseDto response = _mapper.Map<CommentResponseDto>(deleted);
 
 		return ResultFactory.Success(
 			response,
@@ -53,7 +59,13 @@ public class CommentService : ICommentService
 
 	public DataResult<CommentResponseDto> GetById(Guid id)
 	{
-		var comment = _commentRepository.Get(p => p.Id == id);
+		Comment? comment = _commentRepository.Get(x => x.Id == id);
+
+		if (comment is null) return ResultFactory.Failure<CommentResponseDto>(
+			null,
+			message: "Not Found",
+			statusCode: System.Net.HttpStatusCode.NotFound);
+
 		CommentResponseDto response = _mapper.Map<CommentResponseDto>(comment);
 		return ResultFactory.Success(
 			response,
@@ -71,18 +83,31 @@ public class CommentService : ICommentService
 
 	public DataResult<CommentDetailResponseDto> GetDetailById(Guid id)
 	{
-		var comment = _commentRepository.Get(p => p.Id == id);
+		Comment? comment = _commentRepository.Get(x => x.Id == id);
+
+		if (comment is null) return ResultFactory.Failure<CommentDetailResponseDto>(
+			null,
+			message: "Not Found",
+			statusCode: System.Net.HttpStatusCode.NotFound);
+
 		CommentDetailResponseDto response = _mapper.Map<CommentDetailResponseDto>(comment);
 		return ResultFactory.Success(
 			response,
 			statusCode: System.Net.HttpStatusCode.OK);
 	}
 
-	public DataResult<CommentResponseDto> Update(UpdateCommentRequestDto dto)
+	public DataResult<CommentResponseDto> Update(Guid id, UpdateCommentRequestDto dto)
 	{
-		Comment updated = _mapper.Map<Comment>(dto);
-		var comment = _commentRepository.Update(updated);
-		CommentResponseDto response = _mapper.Map<CommentResponseDto>(comment);
+		Comment? comment = _commentRepository.Get(x => x.Id == id);
+
+		if (comment is null) return ResultFactory.Failure<CommentResponseDto>(
+			null,
+			message: "Not Found",
+			statusCode: System.Net.HttpStatusCode.NotFound);
+
+		_mapper.Map(dto, comment);
+		var updated = _commentRepository.Update(comment);
+		CommentResponseDto response = _mapper.Map<CommentResponseDto>(updated);
 
 		return ResultFactory.Success(
 			response,

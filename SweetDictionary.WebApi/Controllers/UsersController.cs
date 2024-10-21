@@ -22,18 +22,18 @@ public class UsersController : ControllerBase
 		return Ok(result);
 	}
 
-	[HttpPut]
-	public IActionResult Update([FromBody] UpdateUserRequestDto dto)
+	[HttpPut("{id:guid}")]
+	public IActionResult Update([FromRoute] Guid id, [FromBody] UpdateUserRequestDto dto)
 	{
-		var result = _userService.Update(dto);
+		var result = _userService.Update(id, dto);
 		if (!result.IsSuccess) return BadRequest(result);
 		return Ok(result);
 	}
 
-	[HttpDelete]
-	public IActionResult Delete([FromBody] DeleteUserRequestDto dto)
+	[HttpDelete("{id:guid}")]
+	public IActionResult Delete([FromRoute] Guid id)
 	{
-		var result = _userService.Delete(dto);
+		var result = _userService.Delete(id);
 		if (!result.IsSuccess) return BadRequest(result);
 		return Ok(result);
 	}

@@ -7,8 +7,8 @@ namespace SweetDictionary.Application.Services.Abstracts;
 public interface IUserService
 {
 	DataResult<UserResponseDto> Create(CreateUserRequestDto dto);
-	DataResult<UserResponseDto> Update(UpdateUserRequestDto dto);
-	DataResult<UserResponseDto> Delete(DeleteUserRequestDto dto);
+	DataResult<UserResponseDto> Update(Guid id, UpdateUserRequestDto dto);
+	DataResult<UserResponseDto> Delete(Guid id);
 	DataResult<List<UserResponseDto>> GetAll();
 	DataResult<UserResponseDto> GetById(Guid id);
 }

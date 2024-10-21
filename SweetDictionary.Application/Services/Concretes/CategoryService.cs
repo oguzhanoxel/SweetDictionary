@@ -31,11 +31,17 @@ public class CategoryService : ICategoryService
 			statusCode: System.Net.HttpStatusCode.Created);
 	}
 
-	public DataResult<CategoryResponseDto> Delete(DeleteCategoryRequestDto dto)
+	public DataResult<CategoryResponseDto> Delete(Guid id)
 	{
-		Category deleted = _mapper.Map<Category>(dto);
-		var category = _categoryRepository.Delete(deleted);
-		CategoryResponseDto response = _mapper.Map<CategoryResponseDto>(category);
+		Category? category = _categoryRepository.Get(x => x.Id == id);
+
+		if (category is null) return ResultFactory.Failure<CategoryResponseDto>(
+			null,
+			message: "Not Found",
+			statusCode: System.Net.HttpStatusCode.NotFound);
+
+		var deleted = _categoryRepository.Delete(category);
+		CategoryResponseDto response = _mapper.Map<CategoryResponseDto>(deleted);
 
 		return ResultFactory.Success(
 			response,
@@ -53,18 +59,31 @@ public class CategoryService : ICategoryService
 
 	public DataResult<CategoryResponseDto> GetById(Guid id)
 	{
-		var category = _categoryRepository.Get(p => p.Id == id);
+		Category? category = _categoryRepository.Get(x => x.Id == id);
+
+		if (category is null) return ResultFactory.Failure<CategoryResponseDto>(
+			null,
+			message: "Not Found",
+			statusCode: System.Net.HttpStatusCode.NotFound);
+
 		CategoryResponseDto response = _mapper.Map<CategoryResponseDto>(category);
 		return ResultFactory.Success(
 			response,
 			statusCode: System.Net.HttpStatusCode.OK);
 	}
 
-	public DataResult<CategoryResponseDto> Update(UpdateCategoryRequestDto dto)
+	public DataResult<CategoryResponseDto> Update(Guid id, UpdateCategoryRequestDto dto)
 	{
-		Category updated = _mapper.Map<Category>(dto);
-		var category = _categoryRepository.Update(updated);
-		CategoryResponseDto response = _mapper.Map<CategoryResponseDto>(category);
+		Category? category = _categoryRepository.Get(x => x.Id == id);
+
+		if (category is null) return ResultFactory.Failure<CategoryResponseDto>(
+			null,
+			message: "Not Found",
+			statusCode: System.Net.HttpStatusCode.NotFound);
+
+		_mapper.Map(dto, category);
+		var updated = _categoryRepository.Update(category);
+		CategoryResponseDto response = _mapper.Map<CategoryResponseDto>(updated);
 
 		return ResultFactory.Success(
 			response,

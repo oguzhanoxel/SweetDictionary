@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
 using Core.Results;
 using SweetDictionary.Application.Services.Abstracts;
+using SweetDictionary.Domain.Dtos.Comment.ResponseDtos;
 using SweetDictionary.Domain.Dtos.Post.RequestDtos;
 using SweetDictionary.Domain.Dtos.Post.ResponseDtos;
 using SweetDictionary.Domain.Entities;
 using SweetDictionary.Persistence.Repositories.Abstracts;
+using SweetDictionary.Persistence.Repositories.Concretes;
 
 namespace SweetDictionary.Application.Services.Concretes;
 
@@ -28,19 +30,20 @@ public class PostService : IPostService
 
 		return ResultFactory.Success(
 			response,
-			statusCode: System.Net.HttpStatusCode.Created);
+		statusCode: System.Net.HttpStatusCode.Created);
 	}
 
-	public DataResult<PostResponseDto> Delete(DeletePostRequestDto dto)
+	public DataResult<PostResponseDto> Delete(Guid id)
 	{
-		if (IsNull(dto.Id)) return ResultFactory.Failure<PostResponseDto>(
-					null,
-					statusCode: System.Net.HttpStatusCode.NotFound,
-					message: "Post not found.");
+		Post? post = _postRepository.Get(x => x.Id == id);
 
-		Post deleted = _mapper.Map<Post>(dto);
-		var post = _postRepository.Delete(deleted);
-		PostResponseDto response = _mapper.Map<PostResponseDto>(post);
+		if (post is null) return ResultFactory.Failure<PostResponseDto>(
+			null,
+			message: "Not Found",
+			statusCode: System.Net.HttpStatusCode.NotFound);
+
+		var deleted = _postRepository.Delete(post);
+		PostResponseDto response = _mapper.Map<PostResponseDto>(deleted);
 
 		return ResultFactory.Success(
 			response,
@@ -58,12 +61,13 @@ public class PostService : IPostService
 
 	public DataResult<PostResponseDto> GetById(Guid id)
 	{
-		if (IsNull(id))	return ResultFactory.Failure<PostResponseDto>(
-							null,
-							statusCode: System.Net.HttpStatusCode.NotFound,
-							message: "Post not found.");
+		Post? post = _postRepository.Get(x => x.Id == id);
 
-		var post = _postRepository.Get(p => p.Id == id);
+		if (post is null) return ResultFactory.Failure<PostResponseDto>(
+			null,
+			message: "Not Found",
+			statusCode: System.Net.HttpStatusCode.NotFound);
+
 		PostResponseDto response = _mapper.Map<PostResponseDto>(post);
 		return ResultFactory.Success(
 			response,
@@ -81,28 +85,31 @@ public class PostService : IPostService
 
 	public DataResult<PostDetailResponseDto> GetDetailById(Guid id)
 	{
-		if (IsNull(id)) return ResultFactory.Failure<PostDetailResponseDto>(
-					null,
-					statusCode: System.Net.HttpStatusCode.NotFound,
-					message: "Post not found.");
+		Post? post = _postRepository.Get(x => x.Id == id);
 
-		var post = _postRepository.Get(p => p.Id == id);
+		if (post is null) return ResultFactory.Failure<PostDetailResponseDto>(
+			null,
+			message: "Not Found",
+			statusCode: System.Net.HttpStatusCode.NotFound);
+
 		PostDetailResponseDto response = _mapper.Map<PostDetailResponseDto>(post);
 		return ResultFactory.Success(
 			response,
 			statusCode: System.Net.HttpStatusCode.OK);
 	}
 
-	public DataResult<PostResponseDto> Update(UpdatePostRequestDto dto)
+	public DataResult<PostResponseDto> Update(Guid id, UpdatePostRequestDto dto)
 	{
-		if (IsNull(dto.Id)) return ResultFactory.Failure<PostResponseDto>(
-					null,
-					statusCode: System.Net.HttpStatusCode.NotFound,
-					message: "Post not found.");
+		Post? post = _postRepository.Get(x => x.Id == id);
 
-		Post updated = _mapper.Map<Post>(dto);
-		var post = _postRepository.Update(updated);
-		PostResponseDto response = _mapper.Map<PostResponseDto>(post);
+		if (post is null) return ResultFactory.Failure<PostResponseDto>(
+			null,
+			message: "Not Found",
+			statusCode: System.Net.HttpStatusCode.NotFound);
+
+		_mapper.Map(dto, post);
+		var updated = _postRepository.Update(post);
+		PostResponseDto response = _mapper.Map<PostResponseDto>(updated);
 
 		return ResultFactory.Success(
 			response,
