@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SweetDictionary.Application.Mappings;
 using SweetDictionary.Application.Services.Abstracts;
 using SweetDictionary.Application.Services.Concretes;
+using SweetDictionary.Domain.Entities;
 using SweetDictionary.Persistence.Contexts;
 using SweetDictionary.Persistence.Repositories.Abstracts;
 using SweetDictionary.Persistence.Repositories.Concretes;
@@ -20,16 +22,20 @@ namespace SweetDictionary.WebApi
 			builder.Services.AddControllers();
 
 			builder.Services.AddScoped<IPostService, PostService>();
+			builder.Services.AddScoped<IAuthService, AuthService>();
 			builder.Services.AddScoped<IUserService, UserService>();
 			builder.Services.AddScoped<ICategoryService, CategoryService>();
 			builder.Services.AddScoped<ICommentService, CommentService>();
 
 			builder.Services.AddScoped<IPostRepository, EfPostRepository>();
-			builder.Services.AddScoped<IUserRepository, EfUserRepository>();
 			builder.Services.AddScoped<ICategoryRepository, EfCategoryRepository>();
 			builder.Services.AddScoped<ICommentRepository, EfCommentRepository>();
 
 			builder.Services.AddDbContext<EfCoreDbContext>(opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("SqlConnection")));
+
+			builder.Services.AddIdentity<User, IdentityRole>()
+				.AddEntityFrameworkStores<EfCoreDbContext>()
+				.AddDefaultTokenProviders();
 
 			builder.Services.AddAutoMapper(typeof(MappingProfiles));
 

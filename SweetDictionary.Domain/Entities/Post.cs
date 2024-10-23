@@ -7,7 +7,7 @@ public sealed class Post : Entity<Guid>
     public string Title { get; set; }
     public string Content { get; set; }
 
-    public Guid AuthorId { get; set; }
+    public string AuthorId { get; set; }
     public User Author { get; set; }
 
     public Guid CategoryId { get; set; }

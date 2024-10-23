@@ -4,4 +4,4 @@ public sealed record CommentResponseDto(
 	Guid Id, 
 	string Text, 
 	Guid PostId, 
-	Guid UserId);
+	string UserId);

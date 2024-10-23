@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SweetDictionary.Application.Services.Abstracts;
-using SweetDictionary.Domain.Dtos.User.RequestDtos;
 
 namespace SweetDictionary.WebApi.Controllers;
 
@@ -15,41 +14,18 @@ public class UsersController : ControllerBase
 		_userService = userService;
 	}
 
-	[HttpPost]
-	public IActionResult Create([FromBody] CreateUserRequestDto dto)
-	{
-		var result = _userService.Create(dto);
-		return Ok(result);
-	}
-
-	[HttpPut("{id:guid}")]
-	public IActionResult Update([FromRoute] Guid id, [FromBody] UpdateUserRequestDto dto)
-	{
-		var result = _userService.Update(id, dto);
-		if (!result.IsSuccess) return BadRequest(result);
-		return Ok(result);
-	}
-
-	[HttpDelete("{id:guid}")]
-	public IActionResult Delete([FromRoute] Guid id)
-	{
-		var result = _userService.Delete(id);
-		if (!result.IsSuccess) return BadRequest(result);
-		return Ok(result);
-	}
-
 	[HttpGet]
-	public IActionResult GetAll()
+	public async Task<IActionResult> GetAllAsync()
 	{
-		var result = _userService.GetAll();
+		var result = await _userService.GetAllAsync();
 		return Ok(result);
 	}
 
-	[HttpGet("{id:guid}")]
-	public IActionResult GetById([FromRoute] Guid id)
+	[HttpGet("{id}")]
+	public async Task<IActionResult> GetByIdAsync([FromRoute] string id)
 	{
-		var result = _userService.GetById(id);
-		if (!result.IsSuccess) return BadRequest(result);
+		var result = await _userService.GetByIdAsync(id);
+		if (!result.IsSuccess) BadRequest(result);
 		return Ok(result);
 	}
 }

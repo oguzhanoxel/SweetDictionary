@@ -6,7 +6,7 @@ public sealed record CommentDetailResponseDto(
 	Guid PostId,
 	string PostTitle,
 	string PostContent,
-	Guid UserId,
+	string UserId,
 	string UserFirstName,
 	string UserLastName,
 	string UserEmail,

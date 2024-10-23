@@ -4,7 +4,7 @@ public sealed record PostDetailResponseDto(
 	Guid Id,
 	string Title,
 	string Content,
-	Guid AuthorId,
+	string AuthorId,
 	string AuthorFirstName,
 	string AuthorLastName,
 	string AuthorEmail,

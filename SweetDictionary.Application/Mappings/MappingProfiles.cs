@@ -35,9 +35,8 @@ public class MappingProfiles : Profile
 		CreateMap<Comment, CommentResponseDto>();
 		CreateMap<Comment, CommentDetailResponseDto>();
 
-		// User
-		CreateMap<CreateUserRequestDto, User>().ReverseMap();
-		CreateMap<UpdateUserRequestDto, User>().ReverseMap();
+		// User And Auth
+		CreateMap<RegisterRequestDto, User>().ReverseMap();
 
 		CreateMap<User, UserResponseDto>();
 	}

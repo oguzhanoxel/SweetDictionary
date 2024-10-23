@@ -1,23 +1,26 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using SweetDictionary.Domain.Entities;
 using System.Reflection;
 
 namespace SweetDictionary.Persistence.Contexts;
 
-public class EfCoreDbContext : DbContext
+public class EfCoreDbContext : IdentityDbContext
 {
     public EfCoreDbContext(DbContextOptions<EfCoreDbContext> options) : base(options)
     {
         
     }
 
-	public DbSet<User> Users { get; set; }
 	public DbSet<Post> Posts { get; set; }
 	public DbSet<Category> Categories { get; set; }
 	public DbSet<Comment> Comments { get; set; }
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
+		base.OnModelCreating(modelBuilder);
+
 		modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
 		SeedData(modelBuilder);
@@ -25,6 +28,8 @@ public class EfCoreDbContext : DbContext
 
 	private void SeedData(ModelBuilder modelBuilder)
 	{
+		var passwordHasher = new PasswordHasher<User>();
+
 		var categories = new List<Category>
 		{
 			new Category { Id = Guid.NewGuid(), Name = "Battles" },
@@ -36,17 +41,28 @@ public class EfCoreDbContext : DbContext
 
 		var users = new List<User>
 		{
-			new User { Id = Guid.NewGuid(), FirstName = "Joseph", LastName = "Joestar", Email = "joseph@jojo.com", Username = "joseph", Password = "hermitpurple" },
-			new User { Id = Guid.NewGuid(), FirstName = "Jotaro", LastName = "Kujo", Email = "jotaro@jojo.com", Username = "jotaro", Password = "starplatinum" },
-			new User { Id = Guid.NewGuid(), FirstName = "Dio", LastName = "Brando", Email = "dio@jojo.com", Username = "dio", Password = "zaWarudo" },
-			new User { Id = Guid.NewGuid(), FirstName = "Giorno", LastName = "Giovanna", Email = "giorno@jojo.com", Username = "giorno", Password = "goldenwind" },
-			new User { Id = Guid.NewGuid(), FirstName = "Josuke", LastName = "Higashikata", Email = "josuke@jojo.com", Username = "josuke", Password = "crazydiamond" },
-			new User { Id = Guid.NewGuid(), FirstName = "Jonathan", LastName = "Joestar", Email = "jonathan@jojo.com", Username = "jonathan", Password = "sunlightyellow" },
-			new User { Id = Guid.NewGuid(), FirstName = "Bruno", LastName = "Bucciarati", Email = "bruno@jojo.com", Username = "bruno", Password = "zippers" },
-			new User { Id = Guid.NewGuid(), FirstName = "Rohan", LastName = "Kishibe", Email = "rohan@jojo.com", Username = "rohan", Password = "heaven'sdoor" },
-			new User { Id = Guid.NewGuid(), FirstName = "Kakyoin", LastName = "Noriaki", Email = "kakyoin@jojo.com", Username = "kakyoin", Password = "cherryeater" },
-			new User { Id = Guid.NewGuid(), FirstName = "Jean Pierre", LastName = "Polnareff", Email = "polnareff@jojo.com", Username = "polnareff", Password = "silverchariot" },
+			new User { Id = Guid.NewGuid().ToString(), FirstName = "Joseph", LastName = "Joestar", Email = "joseph@jojo.com", UserName = "joseph" },
+			new User { Id = Guid.NewGuid().ToString(), FirstName = "Jotaro", LastName = "Kujo", Email = "jotaro@jojo.com", UserName = "jotaro" },
+			new User { Id = Guid.NewGuid().ToString(), FirstName = "Dio", LastName = "Brando", Email = "dio@jojo.com", UserName = "dio" },
+			new User { Id = Guid.NewGuid().ToString(), FirstName = "Giorno", LastName = "Giovanna", Email = "giorno@jojo.com", UserName = "giorno" },
+			new User { Id = Guid.NewGuid().ToString(), FirstName = "Josuke", LastName = "Higashikata", Email = "josuke@jojo.com", UserName = "josuke" },
+			new User { Id = Guid.NewGuid().ToString(), FirstName = "Jonathan", LastName = "Joestar", Email = "jonathan@jojo.com", UserName = "jonathan" },
+			new User { Id = Guid.NewGuid().ToString(), FirstName = "Bruno", LastName = "Bucciarati", Email = "bruno@jojo.com", UserName = "bruno" },
+			new User { Id = Guid.NewGuid().ToString(), FirstName = "Rohan", LastName = "Kishibe", Email = "rohan@jojo.com", UserName = "rohan" },
+			new User { Id = Guid.NewGuid().ToString(), FirstName = "Kakyoin", LastName = "Noriaki", Email = "kakyoin@jojo.com", UserName = "kakyoin" },
+			new User { Id = Guid.NewGuid().ToString(), FirstName = "Jean Pierre", LastName = "Polnareff", Email = "polnareff@jojo.com", UserName = "polnareff" },
 		};
+
+		users[0].PasswordHash = passwordHasher.HashPassword(users[0], "hermitpurple");
+		users[1].PasswordHash = passwordHasher.HashPassword(users[1], "starplatinum");
+		users[2].PasswordHash = passwordHasher.HashPassword(users[2], "zaWarudo");
+		users[3].PasswordHash = passwordHasher.HashPassword(users[3], "goldenwind");
+		users[4].PasswordHash = passwordHasher.HashPassword(users[4], "crazydiamond");
+		users[5].PasswordHash = passwordHasher.HashPassword(users[5], "sunlightyellow");
+		users[6].PasswordHash = passwordHasher.HashPassword(users[6], "zippers");
+		users[7].PasswordHash = passwordHasher.HashPassword(users[7], "heaven'sdoor");
+		users[8].PasswordHash = passwordHasher.HashPassword(users[8], "cherryeater");
+		users[9].PasswordHash = passwordHasher.HashPassword(users[9], "silverchariot");
 
 		var posts = new List<Post>
 		{

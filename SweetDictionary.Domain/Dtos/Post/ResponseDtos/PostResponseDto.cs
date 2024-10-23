@@ -4,5 +4,5 @@ public sealed record PostResponseDto(
 	Guid Id, 
 	string Title, 
 	string Content,
-	Guid AuthorId,
+	string AuthorId,
 	Guid CategoryId);
