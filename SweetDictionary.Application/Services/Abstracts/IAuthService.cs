@@ -7,4 +7,6 @@ namespace SweetDictionary.Application.Services.Abstracts;
 public interface IAuthService
 {
 	Task<DataResult<UserResponseDto>> RegisterAsync(RegisterRequestDto dto);
+	Task<DataResult<UserResponseDto>> LoginAsync(LoginRequestDto dto);
+	Task<Result> LogoutAsync();
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SweetDictionary.Application.Services.Abstracts;
 using SweetDictionary.Domain.Dtos.Post.RequestDtos;
 
@@ -15,6 +16,7 @@ public class PostsController : ControllerBase
         _postService = postService;
     }
 
+    [Authorize]
 	[HttpPost]
 	public IActionResult Create([FromBody] CreatePostRequestDto dto)
 	{

@@ -33,6 +33,8 @@ namespace SweetDictionary.WebApi
 
 			builder.Services.AddDbContext<EfCoreDbContext>(opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("SqlConnection")));
 
+			builder.Services.AddAuthorization();
+
 			builder.Services.AddIdentity<User, IdentityRole>()
 				.AddEntityFrameworkStores<EfCoreDbContext>()
 				.AddDefaultTokenProviders();
