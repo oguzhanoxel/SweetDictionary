@@ -1,7 +1,9 @@
+using Core.Exceptions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SweetDictionary.Application.Mappings;
+using SweetDictionary.Application.Rules;
 using SweetDictionary.Application.Services.Abstracts;
 using SweetDictionary.Application.Services.Concretes;
 using SweetDictionary.Domain.Entities;
@@ -31,6 +33,11 @@ namespace SweetDictionary.WebApi
 			builder.Services.AddScoped<ICategoryRepository, EfCategoryRepository>();
 			builder.Services.AddScoped<ICommentRepository, EfCommentRepository>();
 
+			builder.Services.AddScoped<PostBusinessRules>();
+			builder.Services.AddScoped<CategoryBusinessRules>();
+			builder.Services.AddScoped<CommentBusinessRules>();
+			builder.Services.AddScoped<UserBusinessRules>();
+
 			builder.Services.AddDbContext<EfCoreDbContext>(opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("SqlConnection")));
 
 			builder.Services.AddAuthorization();
@@ -53,6 +60,8 @@ namespace SweetDictionary.WebApi
 				app.UseSwagger();
 				app.UseSwaggerUI();
 			}
+
+			app.UseCustomExceptionMiddleware(); // ExceptionMiddleware
 
 			app.UseHttpsRedirection();
 

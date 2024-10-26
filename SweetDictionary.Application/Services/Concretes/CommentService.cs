@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Core.Results;
+using SweetDictionary.Application.Rules;
 using SweetDictionary.Application.Services.Abstracts;
 using SweetDictionary.Domain.Dtos.Comment.RequestDtos;
 using SweetDictionary.Domain.Dtos.Comment.ResponseDtos;
@@ -12,11 +13,13 @@ public class CommentService : ICommentService
 {
 	private readonly ICommentRepository _commentRepository;
 	private readonly IMapper _mapper;
+	private readonly CommentBusinessRules _businessRules;
 
-	public CommentService(ICommentRepository commentRepository, IMapper mapper)
+	public CommentService(ICommentRepository commentRepository, IMapper mapper, CommentBusinessRules businessRules)
 	{
 		_commentRepository = commentRepository;
 		_mapper = mapper;
+		_businessRules = businessRules;
 	}
 
 	public DataResult<CommentResponseDto> Create(CreateCommentRequestDto dto)
@@ -33,13 +36,8 @@ public class CommentService : ICommentService
 
 	public DataResult<CommentResponseDto> Delete(Guid id)
 	{
+		_businessRules.CommentShouldExistWhenRequested(id);
 		Comment? comment = _commentRepository.Get(x => x.Id == id);
-
-		if (comment is null) return ResultFactory.Failure<CommentResponseDto>(
-			null,
-			message: "Not Found",
-			statusCode: System.Net.HttpStatusCode.NotFound);
-
 		var deleted = _commentRepository.Delete(comment);
 		CommentResponseDto response = _mapper.Map<CommentResponseDto>(deleted);
 
@@ -52,6 +50,7 @@ public class CommentService : ICommentService
 	{
 		var comments = _commentRepository.GetAll();
 		List<CommentResponseDto> response = _mapper.Map<List<CommentResponseDto>>(comments);
+		
 		return ResultFactory.Success(
 			response,
 			statusCode: System.Net.HttpStatusCode.OK);
@@ -59,14 +58,10 @@ public class CommentService : ICommentService
 
 	public DataResult<CommentResponseDto> GetById(Guid id)
 	{
+		_businessRules.CommentShouldExistWhenRequested(id);
 		Comment? comment = _commentRepository.Get(x => x.Id == id);
-
-		if (comment is null) return ResultFactory.Failure<CommentResponseDto>(
-			null,
-			message: "Not Found",
-			statusCode: System.Net.HttpStatusCode.NotFound);
-
 		CommentResponseDto response = _mapper.Map<CommentResponseDto>(comment);
+		
 		return ResultFactory.Success(
 			response,
 			statusCode: System.Net.HttpStatusCode.OK);
@@ -76,6 +71,7 @@ public class CommentService : ICommentService
 	{
 		var comments = _commentRepository.GetAll();
 		List<CommentDetailResponseDto> response = _mapper.Map<List<CommentDetailResponseDto>>(comments);
+		
 		return ResultFactory.Success(
 			response,
 			statusCode: System.Net.HttpStatusCode.OK);
@@ -83,14 +79,10 @@ public class CommentService : ICommentService
 
 	public DataResult<CommentDetailResponseDto> GetDetailById(Guid id)
 	{
+		_businessRules.CommentShouldExistWhenRequested(id);
 		Comment? comment = _commentRepository.Get(x => x.Id == id);
-
-		if (comment is null) return ResultFactory.Failure<CommentDetailResponseDto>(
-			null,
-			message: "Not Found",
-			statusCode: System.Net.HttpStatusCode.NotFound);
-
 		CommentDetailResponseDto response = _mapper.Map<CommentDetailResponseDto>(comment);
+		
 		return ResultFactory.Success(
 			response,
 			statusCode: System.Net.HttpStatusCode.OK);
@@ -98,13 +90,8 @@ public class CommentService : ICommentService
 
 	public DataResult<CommentResponseDto> Update(Guid id, UpdateCommentRequestDto dto)
 	{
+		_businessRules.CommentShouldExistWhenRequested(id);
 		Comment? comment = _commentRepository.Get(x => x.Id == id);
-
-		if (comment is null) return ResultFactory.Failure<CommentResponseDto>(
-			null,
-			message: "Not Found",
-			statusCode: System.Net.HttpStatusCode.NotFound);
-
 		_mapper.Map(dto, comment);
 		var updated = _commentRepository.Update(comment);
 		CommentResponseDto response = _mapper.Map<CommentResponseDto>(updated);

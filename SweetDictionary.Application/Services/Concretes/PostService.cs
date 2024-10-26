@@ -1,12 +1,11 @@
 ﻿using AutoMapper;
 using Core.Results;
+using SweetDictionary.Application.Rules;
 using SweetDictionary.Application.Services.Abstracts;
-using SweetDictionary.Domain.Dtos.Comment.ResponseDtos;
 using SweetDictionary.Domain.Dtos.Post.RequestDtos;
 using SweetDictionary.Domain.Dtos.Post.ResponseDtos;
 using SweetDictionary.Domain.Entities;
 using SweetDictionary.Persistence.Repositories.Abstracts;
-using SweetDictionary.Persistence.Repositories.Concretes;
 
 namespace SweetDictionary.Application.Services.Concretes;
 
@@ -14,11 +13,13 @@ public class PostService : IPostService
 {
 	private readonly IPostRepository _postRepository;
 	private readonly IMapper _mapper;
+	private readonly PostBusinessRules _businessRules;
 
-    public PostService(IPostRepository postRepository, IMapper mapper)
+    public PostService(IPostRepository postRepository, IMapper mapper, PostBusinessRules businessRules)
     {
 		_postRepository = postRepository;
         _mapper = mapper;
+		_businessRules = businessRules;
     }
 
     public DataResult<PostResponseDto> Create(CreatePostRequestDto dto)
@@ -35,13 +36,8 @@ public class PostService : IPostService
 
 	public DataResult<PostResponseDto> Delete(Guid id)
 	{
+		_businessRules.PostShouldExistWhenRequested(id);
 		Post? post = _postRepository.Get(x => x.Id == id);
-
-		if (post is null) return ResultFactory.Failure<PostResponseDto>(
-			null,
-			message: "Not Found",
-			statusCode: System.Net.HttpStatusCode.NotFound);
-
 		var deleted = _postRepository.Delete(post);
 		PostResponseDto response = _mapper.Map<PostResponseDto>(deleted);
 
@@ -54,6 +50,7 @@ public class PostService : IPostService
 	{
 		var posts = _postRepository.GetAll();
 		List<PostResponseDto> response = _mapper.Map<List<PostResponseDto>>(posts);
+		
 		return ResultFactory.Success(
 			response,
 			statusCode: System.Net.HttpStatusCode.OK);
@@ -61,14 +58,10 @@ public class PostService : IPostService
 
 	public DataResult<PostResponseDto> GetById(Guid id)
 	{
+		_businessRules.PostShouldExistWhenRequested(id);
 		Post? post = _postRepository.Get(x => x.Id == id);
-
-		if (post is null) return ResultFactory.Failure<PostResponseDto>(
-			null,
-			message: "Not Found",
-			statusCode: System.Net.HttpStatusCode.NotFound);
-
 		PostResponseDto response = _mapper.Map<PostResponseDto>(post);
+		
 		return ResultFactory.Success(
 			response,
 			statusCode: System.Net.HttpStatusCode.OK);
@@ -78,6 +71,7 @@ public class PostService : IPostService
 	{
 		var posts = _postRepository.GetAll();
 		List<PostDetailResponseDto> response = _mapper.Map<List<PostDetailResponseDto>>(posts);
+		
 		return ResultFactory.Success(
 			response,
 			statusCode: System.Net.HttpStatusCode.OK);
@@ -85,14 +79,10 @@ public class PostService : IPostService
 
 	public DataResult<PostDetailResponseDto> GetDetailById(Guid id)
 	{
+		_businessRules.PostShouldExistWhenRequested(id);
 		Post? post = _postRepository.Get(x => x.Id == id);
-
-		if (post is null) return ResultFactory.Failure<PostDetailResponseDto>(
-			null,
-			message: "Not Found",
-			statusCode: System.Net.HttpStatusCode.NotFound);
-
 		PostDetailResponseDto response = _mapper.Map<PostDetailResponseDto>(post);
+		
 		return ResultFactory.Success(
 			response,
 			statusCode: System.Net.HttpStatusCode.OK);
@@ -100,26 +90,14 @@ public class PostService : IPostService
 
 	public DataResult<PostResponseDto> Update(Guid id, UpdatePostRequestDto dto)
 	{
+		_businessRules.PostShouldExistWhenRequested(id);
 		Post? post = _postRepository.Get(x => x.Id == id);
-
-		if (post is null) return ResultFactory.Failure<PostResponseDto>(
-			null,
-			message: "Not Found",
-			statusCode: System.Net.HttpStatusCode.NotFound);
-
 		_mapper.Map(dto, post);
 		var updated = _postRepository.Update(post);
 		PostResponseDto response = _mapper.Map<PostResponseDto>(updated);
-
+		
 		return ResultFactory.Success(
 			response,
 			statusCode: System.Net.HttpStatusCode.OK);
-	}
-
-	private bool IsNull(Guid id)
-	{
-		var post = _postRepository.Get(p => p.Id == id);
-		if (post == null) return true;
-		return false;
 	}
 }

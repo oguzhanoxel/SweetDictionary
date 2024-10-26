@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Core.Results;
+using SweetDictionary.Application.Rules;
 using SweetDictionary.Application.Services.Abstracts;
 using SweetDictionary.Domain.Dtos.Category.RequestDtos;
 using SweetDictionary.Domain.Dtos.Category.ResponseDtos;
@@ -12,11 +13,13 @@ public class CategoryService : ICategoryService
 {
 	private readonly ICategoryRepository _categoryRepository;
 	private readonly IMapper _mapper;
+	private readonly CategoryBusinessRules _businessRules;
 
-    public CategoryService(ICategoryRepository categoryRepository, IMapper mapper)
+    public CategoryService(ICategoryRepository categoryRepository, IMapper mapper, CategoryBusinessRules businessRules)
     {
         _categoryRepository = categoryRepository;
 		_mapper = mapper;
+		_businessRules = businessRules;
     }
 
 	public DataResult<CategoryResponseDto> Create(CreateCategoryRequestDto dto)
@@ -33,13 +36,8 @@ public class CategoryService : ICategoryService
 
 	public DataResult<CategoryResponseDto> Delete(Guid id)
 	{
+		_businessRules.CategoryShouldExistWhenRequested(id);
 		Category? category = _categoryRepository.Get(x => x.Id == id);
-
-		if (category is null) return ResultFactory.Failure<CategoryResponseDto>(
-			null,
-			message: "Not Found",
-			statusCode: System.Net.HttpStatusCode.NotFound);
-
 		var deleted = _categoryRepository.Delete(category);
 		CategoryResponseDto response = _mapper.Map<CategoryResponseDto>(deleted);
 
@@ -59,14 +57,10 @@ public class CategoryService : ICategoryService
 
 	public DataResult<CategoryResponseDto> GetById(Guid id)
 	{
+		_businessRules.CategoryShouldExistWhenRequested(id);
 		Category? category = _categoryRepository.Get(x => x.Id == id);
-
-		if (category is null) return ResultFactory.Failure<CategoryResponseDto>(
-			null,
-			message: "Not Found",
-			statusCode: System.Net.HttpStatusCode.NotFound);
-
 		CategoryResponseDto response = _mapper.Map<CategoryResponseDto>(category);
+		
 		return ResultFactory.Success(
 			response,
 			statusCode: System.Net.HttpStatusCode.OK);
@@ -74,13 +68,8 @@ public class CategoryService : ICategoryService
 
 	public DataResult<CategoryResponseDto> Update(Guid id, UpdateCategoryRequestDto dto)
 	{
+		_businessRules.CategoryShouldExistWhenRequested(id);
 		Category? category = _categoryRepository.Get(x => x.Id == id);
-
-		if (category is null) return ResultFactory.Failure<CategoryResponseDto>(
-			null,
-			message: "Not Found",
-			statusCode: System.Net.HttpStatusCode.NotFound);
-
 		_mapper.Map(dto, category);
 		var updated = _categoryRepository.Update(category);
 		CategoryResponseDto response = _mapper.Map<CategoryResponseDto>(updated);

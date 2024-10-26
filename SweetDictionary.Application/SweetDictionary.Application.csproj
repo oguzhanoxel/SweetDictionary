@@ -17,8 +17,4 @@
     <ProjectReference Include="..\SweetDictionary.Persistence\SweetDictionary.Persistence.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Rules\" />
-  </ItemGroup>
-
 </Project>
