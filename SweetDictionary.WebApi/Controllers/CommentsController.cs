@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SweetDictionary.Application.Services.Abstracts;
 using SweetDictionary.Domain.Dtos.Comment.RequestDtos;
 
@@ -6,6 +7,7 @@ namespace SweetDictionary.WebApi.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
 public class CommentsController : ControllerBase
 {
 	private readonly ICommentService _commentService;
@@ -39,6 +41,7 @@ public class CommentsController : ControllerBase
 	}
 
 	[HttpGet]
+	[AllowAnonymous]
 	public IActionResult GetAll()
 	{
 		var result = _commentService.GetAll();
@@ -46,6 +49,7 @@ public class CommentsController : ControllerBase
 	}
 
 	[HttpGet("details")]
+	[AllowAnonymous]
 	public IActionResult GetDetailAll()
 	{
 		var result = _commentService.GetDetailAll();
@@ -53,6 +57,7 @@ public class CommentsController : ControllerBase
 	}
 
 	[HttpGet("{id:guid}")]
+	[AllowAnonymous]
 	public IActionResult GetById([FromRoute] Guid id)
 	{
 		var result = _commentService.GetById(id);
@@ -61,6 +66,7 @@ public class CommentsController : ControllerBase
 	}
 
 	[HttpGet("{id:guid}/detail")]
+	[AllowAnonymous]
 	public IActionResult GetDetailById([FromRoute] Guid id)
 	{
 		var result = _commentService.GetDetailById(id);

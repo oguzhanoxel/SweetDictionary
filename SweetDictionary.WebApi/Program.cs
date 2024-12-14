@@ -1,7 +1,9 @@
+using System.Text;
 using Core.Exceptions;
-using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using SweetDictionary.Application.Mappings;
 using SweetDictionary.Application.Rules;
 using SweetDictionary.Application.Services.Abstracts;
@@ -39,12 +41,31 @@ namespace SweetDictionary.WebApi
 			builder.Services.AddScoped<UserBusinessRules>();
 
 			builder.Services.AddDbContext<EfCoreDbContext>(opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("SqlConnection")));
-
-			builder.Services.AddAuthorization();
-
+			
 			builder.Services.AddIdentity<User, IdentityRole>()
 				.AddEntityFrameworkStores<EfCoreDbContext>()
 				.AddDefaultTokenProviders();
+
+			builder.Services.AddAuthentication(options =>
+			{
+				options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+				options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+				options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+			})
+			.AddJwtBearer(options =>
+			{
+				options.SaveToken = true;
+				options.RequireHttpsMetadata = false;
+				options.TokenValidationParameters = new()
+				{
+					ValidateIssuer = true,
+					ValidateAudience = true,
+					ValidAudience = builder.Configuration["JWT:ValidAudience"],
+					ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
+					ClockSkew = TimeSpan.Zero,
+					IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
+				};
+			});	
 
 			builder.Services.AddAutoMapper(typeof(MappingProfiles));
 
@@ -65,8 +86,9 @@ namespace SweetDictionary.WebApi
 
 			app.UseHttpsRedirection();
 
-			app.UseAuthorization();
+			app.UseAuthentication();
 
+			app.UseAuthorization();
 
 			app.MapControllers();
 

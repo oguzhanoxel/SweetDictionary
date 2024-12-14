@@ -1,12 +1,10 @@
 ﻿using Core.Results;
 using SweetDictionary.Domain.Dtos.User.RequestDtos;
-using SweetDictionary.Domain.Dtos.User.ResponseDtos;
 
 namespace SweetDictionary.Application.Services.Abstracts;
 
 public interface IAuthService
 {
-	Task<DataResult<UserResponseDto>> RegisterAsync(RegisterRequestDto dto);
-	Task<DataResult<UserResponseDto>> LoginAsync(LoginRequestDto dto);
-	Task<Result> LogoutAsync();
+	Task<Result> Register(RegisterRequestDto dto, string role);
+	Task<DataResult<string>> Login(LoginRequestDto dto);
 }

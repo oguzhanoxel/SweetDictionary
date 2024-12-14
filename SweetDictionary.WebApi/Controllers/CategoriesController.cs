@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SweetDictionary.Application.Services.Abstracts;
 using SweetDictionary.Domain.Dtos.Category.RequestDtos;
 
@@ -6,6 +7,7 @@ namespace SweetDictionary.WebApi.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
 public class CategoriesController : ControllerBase
 {
 	private readonly ICategoryService _categoryService;
@@ -14,8 +16,9 @@ public class CategoriesController : ControllerBase
 	{
 		_categoryService = categoryService;
 	}
-
+	
 	[HttpPost]
+	[Authorize(Roles = "Admin")]
 	public IActionResult Create([FromBody] CreateCategoryRequestDto dto)
 	{
 		var result = _categoryService.Create(dto);
@@ -23,6 +26,7 @@ public class CategoriesController : ControllerBase
 	}
 
 	[HttpPut("{id:guid}")]
+	[Authorize(Roles = "Admin")]
 	public IActionResult Update(Guid id, [FromBody] UpdateCategoryRequestDto dto)
 	{
 		var result = _categoryService.Update(id, dto);
@@ -31,6 +35,7 @@ public class CategoriesController : ControllerBase
 	}
 
 	[HttpDelete("{id:guid}")]
+	[Authorize(Roles = "Admin")]
 	public IActionResult Delete([FromRoute] Guid id)
 	{
 		var result = _categoryService.Delete(id);
@@ -39,6 +44,7 @@ public class CategoriesController : ControllerBase
 	}
 
 	[HttpGet]
+	[AllowAnonymous]
 	public IActionResult GetAll()
 	{
 		var result = _categoryService.GetAll();
@@ -46,6 +52,7 @@ public class CategoriesController : ControllerBase
 	}
 
 	[HttpGet("{id:guid}")]
+	[AllowAnonymous]
 	public IActionResult GetById([FromRoute] Guid id)
 	{
 		var result = _categoryService.GetById(id);

@@ -7,6 +7,7 @@ namespace SweetDictionary.WebApi.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
 public class PostsController : ControllerBase
 {
 	private readonly IPostService _postService;
@@ -16,7 +17,6 @@ public class PostsController : ControllerBase
         _postService = postService;
     }
 
-    [Authorize]
 	[HttpPost]
 	public IActionResult Create([FromBody] CreatePostRequestDto dto)
 	{
@@ -39,8 +39,9 @@ public class PostsController : ControllerBase
         if (!result.IsSuccess) BadRequest(result);
         return Ok(result);
     }
-
+    
 	[HttpGet]
+	[AllowAnonymous]
     public IActionResult GetAll()
     {
         var result = _postService.GetAll();
@@ -48,6 +49,7 @@ public class PostsController : ControllerBase
     }
 
 	[HttpGet("details")]
+	[AllowAnonymous]
 	public IActionResult GetDetailAll()
 	{
 		var result = _postService.GetDetailAll();
@@ -55,6 +57,7 @@ public class PostsController : ControllerBase
 	}
 
 	[HttpGet("{id:guid}")]
+	[AllowAnonymous]
     public IActionResult GetById([FromRoute] Guid id)
     {
         var result = _postService.GetById(id);
@@ -63,6 +66,7 @@ public class PostsController : ControllerBase
 	}
 
 	[HttpGet("{id:guid}/detail")]
+	[AllowAnonymous]
 	public IActionResult GetDetailById([FromRoute] Guid id)
 	{
 		var result = _postService.GetDetailById(id);
