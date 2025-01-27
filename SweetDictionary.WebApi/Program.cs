@@ -4,10 +4,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using SweetDictionary.Application.Mappings;
-using SweetDictionary.Application.Rules;
-using SweetDictionary.Application.Services.Abstracts;
-using SweetDictionary.Application.Services.Concretes;
+using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.SwaggerGen;
+using SweetDictionary.Application;
 using SweetDictionary.Domain.Entities;
 using SweetDictionary.Persistence.Contexts;
 using SweetDictionary.Persistence.Repositories.Abstracts;
@@ -25,21 +24,11 @@ namespace SweetDictionary.WebApi
 
 			builder.Services.AddControllers();
 
-			builder.Services.AddScoped<IPostService, PostService>();
-			builder.Services.AddScoped<IAuthService, AuthService>();
-			builder.Services.AddScoped<IUserService, UserService>();
-			builder.Services.AddScoped<ICategoryService, CategoryService>();
-			builder.Services.AddScoped<ICommentService, CommentService>();
+			builder.Services.AddApplicationServices();
 
 			builder.Services.AddScoped<IPostRepository, EfPostRepository>();
 			builder.Services.AddScoped<ICategoryRepository, EfCategoryRepository>();
 			builder.Services.AddScoped<ICommentRepository, EfCommentRepository>();
-
-			builder.Services.AddScoped<PostBusinessRules>();
-			builder.Services.AddScoped<CategoryBusinessRules>();
-			builder.Services.AddScoped<CommentBusinessRules>();
-			builder.Services.AddScoped<UserBusinessRules>();
-
 			builder.Services.AddDbContext<EfCoreDbContext>(opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("SqlConnection")));
 			
 			builder.Services.AddIdentity<User, IdentityRole>()
@@ -65,13 +54,28 @@ namespace SweetDictionary.WebApi
 					ClockSkew = TimeSpan.Zero,
 					IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
 				};
-			});	
-
-			builder.Services.AddAutoMapper(typeof(MappingProfiles));
-
+			});
+			
 			// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 			builder.Services.AddEndpointsApiExplorer();
-			builder.Services.AddSwaggerGen();
+			builder.Services.AddSwaggerGen(opt =>
+			{
+				opt.AddSecurityDefinition(
+					name: "Bearer",
+					securityScheme: new OpenApiSecurityScheme
+					{
+						Name = "Authorization",
+						Type = SecuritySchemeType.Http,
+						Scheme = "Bearer",
+						BearerFormat = "JWT",
+						In = ParameterLocation.Header,
+						Description =
+							"JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer YOUR_TOKEN\". \r\n\r\n"
+							+ "`Enter your token in the text input below.`"
+					}
+				);
+				opt.OperationFilter<BearerSecurityRequirementOperationFilter>();
+			});
 
 			var app = builder.Build();
 
@@ -94,5 +98,29 @@ namespace SweetDictionary.WebApi
 
 			app.Run();
 		}
+	}
+}
+
+public class BearerSecurityRequirementOperationFilter : IOperationFilter
+{
+	public void Apply(OpenApiOperation operation, OperationFilterContext context)
+	{
+		const string openApiSecurityScheme = "oauth2",
+			openApiSecurityName = "Bearer";
+		OpenApiSecurityRequirement openApiSecurityRequirement =
+			new()
+			{
+				{
+					new OpenApiSecurityScheme
+					{
+						Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = openApiSecurityName },
+						Scheme = openApiSecurityScheme,
+						Name = openApiSecurityName,
+						In = ParameterLocation.Header,
+					},
+					Array.Empty<string>()
+				}
+			};
+		operation.Security.Add(openApiSecurityRequirement);
 	}
 }

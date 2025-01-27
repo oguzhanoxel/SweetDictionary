@@ -20,21 +20,9 @@ public class UserBusinessRules
 		if (user is null) throw new BusinessException("Not Found");
 	}
 	
-	public async Task UserShouldNOTExistWhenRequestedAsync(string email)
+	public async Task UserShouldNotExistWhenRequestedAsync(string email)
 	{
 		User? user = await _userManager.FindByEmailAsync(email);
 		if (user is not null) throw new BusinessException("User Already Exists");
-	}
-	
-	public async Task UserShouldHaveValidEmailFormatWhenCreatedAsync(string email)
-	{
-		try
-		{ 
-			var emailAddress = new MailAddress(email);
-		}
-		catch
-		{
-			throw new BusinessException("Invalid Email Address");
-		}
 	}
 }

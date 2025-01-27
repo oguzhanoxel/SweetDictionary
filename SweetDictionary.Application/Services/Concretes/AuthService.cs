@@ -35,8 +35,7 @@ public class AuthService : IAuthService
 
 	public async Task<Result> Register(RegisterRequestDto dto, string role)
 	{
-		await _businessRules.UserShouldHaveValidEmailFormatWhenCreatedAsync(dto.Email);
-		await _businessRules.UserShouldNOTExistWhenRequestedAsync(dto.Email);
+		await _businessRules.UserShouldNotExistWhenRequestedAsync(dto.Email);
 		
 		User user = _mapper.Map<User>(dto);
 		user.SecurityStamp = Guid.NewGuid().ToString();
@@ -47,7 +46,7 @@ public class AuthService : IAuthService
 		if (!await _roleManager.RoleExistsAsync(role)) 
 			await _roleManager.CreateAsync(new IdentityRole(role));
 		
-		_userManager.AddToRoleAsync(user, role);
+		await _userManager.AddToRoleAsync(user, role);
 		
 		return ResultFactory.Success(statusCode:HttpStatusCode.Created);
 	}
